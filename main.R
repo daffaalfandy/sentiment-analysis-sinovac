@@ -1,11 +1,3 @@
-library(twitteR)
-library(dplyr)
-library(tidyr)
-library(ROAuth)
-library(Rstem)
-library(sentiment)
-library(ggplot2)
-
 # connect to twitter developer account
 CUSTOMER_KEY <- "njqvO4xMoofljmDQBqyPfqjXo"
 CUSTOMER_SECRET <- "a8Yf3ipR7xrIPphZ45l3LQuyi9K6f1jAzP4eIkg4X9z0OrujTF"
@@ -42,12 +34,10 @@ cleaned_data <- gsub(" $", "", cleaned_data)
 
 write.csv(cleaned_data, file = "tidy-data.csv")
 
-# ## just used for creating image
-# library(RColorBrewer)
-# library(wordcloud)
-# corp <- Corpus(VectorSource(cleaned_data))
-# cleaned_data.text.corpus <- tm_map(corp, function(x)removeWords(x, stopwords()))
-# wordcloud(cleaned_data.text.corpus, min.freq = 10, colors = brewer.pal(8, "Dark2"), random.color = TRUE, max.words = 1000)
+## just used for creating image
+corp <- Corpus(VectorSource(cleaned_data))
+cleaned_data.text.corpus <- tm_map(corp, function(x)removeWords(x, stopwords()))
+word_cloud_plot <- wordcloud(cleaned_data.text.corpus, min.freq = 10, colors = brewer.pal(8, "Dark2"), random.color = TRUE, max.words = 1000)
 
 
 # classify emotion
@@ -63,21 +53,24 @@ polarity = class_pol[,4]
 
 # create and sort dataframe with results
 dataframe = data.frame(text=cleaned_data, emotion=emotion, polarity=polarity, stringsAsFactors=FALSE)
-dataframe = within(dataframe, emotion <- factor(emotion, levels=names(sort(table(emotion), decreasing=TRUE))))
+## run on shiny app
+# dataframe = within(dataframe, emotion <- factor(emotion, levels=names(sort(table(emotion), decreasing=TRUE))))
 table(dataframe$emotion)
 
 write.csv(dataframe, file = "sentiment-data.csv")
 
 # plot distribution of emotions
-ggplot(dataframe, aes(x=emotion)) +
-  geom_bar(aes(y=..count.., fill=emotion)) + scale_fill_brewer(palette="Dark2") +
-  labs(x="emotion categories", y="number of tweets") + 
-  labs(title = "Sentiment Analysis of Vaksin Sinovac", plot.title = element_text(size=12))
+## run on shiny app
+# ggplot(dataframe, aes(x=emotion)) +
+# geom_bar(aes(y=..count.., fill=emotion)) + scale_fill_brewer(palette="Dark2") +
+# labs(x="emotion categories", y="number of tweets") + 
+# labs(title = "Sentiment Analysis of Vaksin Sinovac", plot.title = element_text(size=12))
 
-# plot distribution of polarity
-ggplot(dataframe, aes(x=polarity)) +
-  geom_bar(aes(y=..count.., fill=polarity)) + scale_fill_brewer(palette="RdGy") +
-  labs(x="Polarity categories", y="Number of tweets") +
-  labs(title = "Polarity Analysis of Vaksin Sinovac", plot.title = element_text(size=12))
+# plot distribution of polarity 
+## run on shiny app
+# ggplot(dataframe, aes(x=polarity)) +
+# geom_bar(aes(y=..count.., fill=polarity)) + scale_fill_brewer(palette="RdGy") +
+# labs(x="Polarity categories", y="Number of tweets") +
+# labs(title = "Polarity Analysis of Vaksin Sinovac", plot.title = element_text(size=12))
 
 table(dataframe$polarity)
