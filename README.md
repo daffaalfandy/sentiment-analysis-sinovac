@@ -1,8 +1,8 @@
 # Sentiment Analysis of Twitter Data
 
-\t![Image of Plots](https://github.com/daffaalfandy/sentiment-analysis-sinovac/blob/master/cover-image.png)
-
-\n This projects using custom dataset for training, customize on `sentiment` packages
+![Image of Plots](https://github.com/daffaalfandy/sentiment-analysis-sinovac/blob/master/cover-image.png)
+<br />
+This projects using custom dataset for training, customize on `sentiment` packages
 
 ## Install packages
 ```
