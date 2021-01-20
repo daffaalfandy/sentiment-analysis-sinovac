@@ -6,41 +6,49 @@ library(Rstem)
 library(sentiment)
 library(ggplot2)
 
-#Connect to twitter account
+# connect to twitter developer account
 CUSTOMER_KEY <- "njqvO4xMoofljmDQBqyPfqjXo"
 CUSTOMER_SECRET <- "a8Yf3ipR7xrIPphZ45l3LQuyi9K6f1jAzP4eIkg4X9z0OrujTF"
 ACCESS_TOKEN <- "2164542606-znR5kpn4nTuzWT6Vk3QINbaq4UTrJAc4J3fM4AG"
 ACCESS_SECRET <- "HwJGqyQouJ11nbWKXBySj5kE3HGcIQL3BeLuIC2qzyqs5"
 setup_twitter_oauth(CUSTOMER_KEY, CUSTOMER_SECRET, ACCESS_TOKEN, ACCESS_SECRET)
 
-#Gathering tweets with hashtags
+# gathering tweets with hashtags
 tweets <- searchTwitter('#sinovac', n = 1000, lang="en")
 sinovac_tweets <- twListToDF(tweets)
 
 write.csv(sinovac_tweets, file = "raw-data.csv")
 
-#Choose text column only
+# choose text column only
 sinovac_text <- sinovac_tweets$text
 
-##Cleaning dataset
-#Convert all text to lower case
+## cleaning dataset
+# ronvert all text to lower case
 cleaned_data <- tolower(sinovac_text)
-#Replace blank space ("RT")
+# replace blank space ("RT")
 cleaned_data <- gsub("rt", "", cleaned_data)
-#Replace twitter @ username handle
+# replace twitter @ username handle
 cleaned_data <- gsub("@\\w+", "", cleaned_data)
-#Remove punctuations
+# remove punctuations
 cleaned_data <- gsub("[[:punct:]]", "", cleaned_data)
-#Remove links in texts
+# remove links in texts
 cleaned_data <- gsub("http\\w+", "", cleaned_data)
-#Remove tabs in texts
+# remove tabs in texts
 cleaned_data <- gsub("[ |\t]{2,}", "", cleaned_data)
-#Remove blank spaces at the beginning
+# remove blank spaces at the beginning
 cleaned_data <- gsub("^ ", "", cleaned_data)
-#Remove blank spaces at the end
+# remove blank spaces at the end
 cleaned_data <- gsub(" $", "", cleaned_data)
 
 write.csv(cleaned_data, file = "tidy-data.csv")
+
+# ## just used for creating image
+# library(RColorBrewer)
+# library(wordcloud)
+# corp <- Corpus(VectorSource(cleaned_data))
+# cleaned_data.text.corpus <- tm_map(corp, function(x)removeWords(x, stopwords()))
+# wordcloud(cleaned_data.text.corpus, min.freq = 10, colors = brewer.pal(8, "Dark2"), random.color = TRUE, max.words = 1000)
+
 
 # classify emotion
 class_emo = classify_emotion(cleaned_data, algorithm="bayes", prior=1.0)
@@ -53,7 +61,7 @@ class_pol = classify_polarity(cleaned_data, algorithm="bayes")
 # get polarity best fit
 polarity = class_pol[,4]
 
-# Create and sort dataframe with results
+# create and sort dataframe with results
 dataframe = data.frame(text=cleaned_data, emotion=emotion, polarity=polarity, stringsAsFactors=FALSE)
 dataframe = within(dataframe, emotion <- factor(emotion, levels=names(sort(table(emotion), decreasing=TRUE))))
 table(dataframe$emotion)
